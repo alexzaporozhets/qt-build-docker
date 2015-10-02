@@ -86,3 +86,6 @@ RUN tar -C /opt -xvJf qt-5.4.2-install-dir-x86_64.tar.xz
 RUN rm -rf qt-5.4.2-install-dir-x86_64.tar.xz
 
 RUN ldconfig
+
+# Copy build sandbox into docker image
+COPY build-sandbox/linux /opt/build-sandbox
