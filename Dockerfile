@@ -64,6 +64,7 @@ RUN apt-get update          &&  \
     libicu-dev \
     libxslt-dev \
     zlib1g-dev \
+    mc \
     wget \
     qtchooser
 
