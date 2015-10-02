@@ -82,6 +82,6 @@ RUN wget https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-di
 RUN tar -C /opt -xvJf qt-5.4.2-install-dir-x86_64.tar.xz
 
 # cleanup
-RUN rm qt-5.4.2-install-dir-x86_64.tar.xz
+RUN rm -rf qt-5.4.2-install-dir-x86_64.tar.xz
 
 RUN ldconfig
