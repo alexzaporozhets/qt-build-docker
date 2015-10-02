@@ -70,16 +70,18 @@ RUN apt-get update          &&  \
 RUN apt-get autoremove -y
 RUN apt-get clean
 
+# moving configuration
+COPY qtchooser/default.conf /usr/lib/x86_64-linux-gnu/qtchooser/default.conf
+COPY etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf /etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf
+
 # settign current working directory
 WORKDIR /opt
 
-# downloading Qt
+# downloading Qt & unpack
 RUN wget https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-dir-x86_64.tar.xz
-
-# unpack
 RUN tar -C /opt -xvJf qt-5.4.2-install-dir-x86_64.tar.xz
 
-COPY qtchooser/default.conf /usr/lib/x86_64-linux-gnu/qtchooser/default.conf
-COPY etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf /etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf
+# cleanup
+RUN rm qt-5.4.2-install-dir-x86_64.tar.xz
 
 RUN ldconfig
