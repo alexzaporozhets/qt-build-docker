@@ -89,4 +89,6 @@ RUN ldconfig
 
 # Copy build sandbox into docker image
 COPY build-sandbox/linux /opt/build-sandbox
+
+# I think we can remove this step
 RUN mkdir -p /opt/build-sandbox/td-qthybrid-app
