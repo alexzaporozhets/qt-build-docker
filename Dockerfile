@@ -79,7 +79,7 @@ COPY etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf /etc/ld.so.conf.d/opt-qt-5.4.2-lib.c
 WORKDIR /opt
 
 # downloading Qt & unpack
-RUN wget https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-dir-x86_64.tar.xz
+RUN wget "https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-dir-x86_64.tar.xz"
 RUN tar -C /opt -xvJf qt-5.4.2-install-dir-x86_64.tar.xz
 
 # cleanup
