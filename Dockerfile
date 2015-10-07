@@ -81,7 +81,7 @@ COPY etc/ld.so.conf.d/opt-qt-5.4.2-lib.conf /etc/ld.so.conf.d/opt-qt-5.4.2-lib.c
 WORKDIR /opt
 
 # downloading Qt & unpack
-RUN wget https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-dir-x86_64.tar.xz
+RUN wget "https://s3.amazonaws.com/mystaff-qt-build/linux/qt5/qt-5.4.2-install-dir-x86_64.tar.xz"
 RUN tar -C /opt -xvJf qt-5.4.2-install-dir-x86_64.tar.xz
 
 # cleanup
@@ -91,4 +91,6 @@ RUN ldconfig
 
 # Copy build sandbox into docker image
 COPY build-sandbox/linux /opt/build-sandbox
+
+# I think we can remove this step
 RUN mkdir -p /opt/build-sandbox/td-qthybrid-app
