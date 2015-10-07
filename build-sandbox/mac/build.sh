@@ -131,5 +131,5 @@ if [ $? -ne 0 ] ; then
     exit 7
 fi
 cd $CWD
-echo "Done: install-td-qthybrid-app-$SRCVER/mystaff-client-$SRCVER-mac.dmg"
+echo "$CWD/install-td-qthybrid-app-$SRCVER/mystaff-client-$SRCVER-mac.dmg"
 exit 0

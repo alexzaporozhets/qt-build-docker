@@ -77,5 +77,5 @@ if [ $? -ne 0 ] ; then
 fi
 
 cd $CWD
-echo "Done: install-td-qthybrid-app-$SRCVER/mystaff-client-$SRCVER-ubuntu$(lsb_release -rs)-$(uname -m).tar.xz"
+echo "$CWD/install-td-qthybrid-app-$SRCVER/mystaff-client-$SRCVER-ubuntu$(lsb_release -rs)-$(uname -m).tar.xz"
 exit 0

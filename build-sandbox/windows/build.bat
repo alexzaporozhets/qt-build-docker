@@ -126,6 +126,7 @@ if "%errorlevel%" NEQ "0" (
 
 cd %CWD%
 
-echo "Done: install-td-qthybrid-app-%SRCVER%\mystaff-client-%SRCVER%-windows.zip"
-echo "      install-td-qthybrid-app-%SRCVER%\mystaff-client-pdb-%SRCVER%-windows.zip"
+REM echo "Done: install-td-qthybrid-app-%SRCVER%\mystaff-client-%SRCVER%-windows.zip"
+REM echo "      install-td-qthybrid-app-%SRCVER%\mystaff-client-pdb-%SRCVER%-windows.zip"
+echo "%CWD\install-td-qthybrid-app-%SRCVER%\mystaff-client-%SRCVER%-windows.zip"
 exit 0
