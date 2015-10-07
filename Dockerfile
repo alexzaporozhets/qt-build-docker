@@ -66,7 +66,9 @@ RUN apt-get update          &&  \
     zlib1g-dev \
     mc \
     wget \
-    qtchooser
+    qtchooser \
+    python-magic \
+    s3cmd
 
 RUN apt-get autoremove -y
 RUN apt-get clean
