@@ -35,15 +35,15 @@ s3CmdOptions=(
     --verbose
 )
 
-if [ -n "$srcFileName" ] ; then
+if [ -n "$srcFileName" -a -e "$srcFileName" ] ; then
     dstFileName=$(basename $srcFileName | sed -e 's|-[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*-|-|')
-    
+
     s3cmd "${s3CmdOptions[@]}"  put --acl-public "$srcFileName" "$s3BucketName/$dstFileName"
     if [ $? -ne 0 ] ; then
         echo "Failed"
         exit 2
     fi
-     
+
     echo "Success"
     exit 0
 else
