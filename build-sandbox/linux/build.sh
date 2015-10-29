@@ -29,20 +29,31 @@ cd $CWD
 DSTDIR=$CWD/install-qthybrid-app/$TARGET-$(uname -m)
 mkdir -p $DSTDIR
 rm -fr $DSTDIR/*
-tar -C $DSTDIR/ -xvJf install-dir-template-ubuntu14.04-x86_64.tar.xz
-if [ $? -ne 0 ] ; then
-    cd $CWD
-    exit 3
+
+if [ -e install-dir-template-linux-x86_64.tar.xz ] ; then
+    tar -C $DSTDIR/ -xvJf install-dir-template-linux-x86_64.tar.xz
+    if [ $? -ne 0 ] ; then
+        cd $CWD
+        exit 3
+    fi
 fi
 
 # copy mystaff client files
 cd $CWD/build-qthybrid-app
 
 # Copy SQLCipher plugin
+mkdir -p $DSTDIR/sqldrivers
 find . -type f -name 'libqsqlcipher.so' -exec cp -a {} $DSTDIR/sqldrivers \;
 if [ $? -ne 0 ] ; then
     cd $CWD
     exit 4
+fi
+
+# Copy Version file
+cp -a $SRCDIR/mystaff-client/version $DSTDIR/version
+if [ $? -ne 0 ] ; then
+    cd $CWD
+    exit 5
 fi
 
 # Copy mystaff client executible file
@@ -70,12 +81,36 @@ done
 
 # Pack mystaff client 
 cd $CWD/install-qthybrid-app
-tar -cvJf mystaff-client-ubuntu$(lsb_release -rs)-$(uname -m).tar.xz $TARGET-$(uname -m)
+tar -cvJf mystaff-client-linux-$(uname -m).tar.xz $TARGET-$(uname -m)
 if [ $? -ne 0 ] ; then
     cd $CWD
     exit 8
 fi
 
+set -x
 cd $CWD
-echo "$CWD/install-qthybrid-app/mystaff-client-ubuntu$(lsb_release -rs)-$(uname -m).tar.xz"
+
+# Copy Qt5 runtime
+if [ -e install-dir-qt5runtime-linux-$(uname -m).tar.xz ] ; then
+    tar -C $DSTDIR/ -xvJf install-dir-qt5runtime-linux-$(uname -m).tar.xz
+    if [ $? -ne 0 ] ; then
+        cd $CWD
+        exit 3
+    fi
+
+    # Pack deployed mystaff client 
+    cd $CWD/install-qthybrid-app
+    tar -cvJf mystaff-client-linux-deployed-$(uname -m).tar.xz $TARGET-$(uname -m)
+    if [ $? -ne 0 ] ; then
+        cd $CWD
+        exit 8
+    fi
+
+    echo "$CWD/install-qthybrid-app/mystaff-client-linux-deployed-$(uname -m).tar.xz"
+else
+    echo "$CWD/install-qthybrid-app/mystaff-client-linux-$(uname -m).tar.xz"
+fi
+
+set +x
+cd $CWD
 exit 0
