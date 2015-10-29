@@ -94,4 +94,5 @@ COPY build-sandbox/linux /opt/build-sandbox
 
 # I think we can remove this step
 RUN mkdir -p /opt/build-sandbox/qthybrid-app
+RUN mkdir -p /opt/build-sandbox/qthybrid-app-installer
 
