@@ -12,7 +12,7 @@ set PATH=C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\;C:\Pro
 
 rem Setup build envirnment
 set CWD=%cd%
-set SRCDIR=%CWD%\td-qthybrid-app
+set SRCDIR=%CWD%\qthybrid-app
 set /p SRCVER=<%SRCDIR%\mystaff-client\version
 set TARGET=mystaff-client
 
@@ -21,81 +21,118 @@ echo "%CWD%"
 echo "%SRCDIR%"
 echo "%SRCVER%"
 
-rmdir %CWD%\build-td-qthybrid-app-%SRCVER% /s /q
-mkdir %CWD%\build-td-qthybrid-app-%SRCVER%
+rmdir %CWD%\build-qthybrid-app /s /q
+mkdir %CWD%\build-qthybrid-app
 
-cd %CWD%\build-td-qthybrid-app-%SRCVER%
+cd %CWD%\build-qthybrid-app
 
 rem Configure sources for build
-qmake -r -spec win32-msvc2010 %SRCDIR%\td-qthybrid-app.pro
+qmake -r -spec win32-msvc2010 %SRCDIR%\qthybrid-app.pro
 if "%errorlevel%" NEQ "0" (
-	echo "Configure failed!!!"
+    echo "Configure failed!!!"
     cd %CWD%
-	exit 1
+    exit 1
 ) 
 
 rem make 
 jom.exe -f Makefile release
 if "%errorlevel%" NEQ "0" (
-	echo "Build failed!!!"
+    echo "Build failed!!!"
     cd %CWD%
-	exit 2
+    exit 2
 ) 
 
 cd %CWD%
 
-rem  Prepare installation directory
-set DSTDIR=%CWD%\install-td-qthybrid-app-%SRCVER%\%TARGET%
+rem Prepare installation directory
+set DSTDIR=%CWD%\install-qthybrid-app\%TARGET%
 rmdir %DSTDIR% /s /q
 mkdir %DSTDIR%
 
-%CWD%\unzip -d %DSTDIR% %CWD%\install-dir-template-windows.zip
-if "%errorlevel%" NEQ "0" (
-    cd %CWD%
-	exit 3
-) 
+if exist "%CWD%\install-dir-template-windows.zip" (
+    %CWD%\unzip -d %DSTDIR% %CWD%\install-dir-template-windows.zip
+    if "%errorlevel%" NEQ "0" (
+        cd %CWD%
+        exit 3
+    ) 
+)
 
 rem copy mystaff client files
-cd %CWD%\build-td-qthybrid-app-%SRCVER%
+cd %CWD%\build-qthybrid-app
 
 rem Copy SQLCipher plugin
 xcopy 3rdparty\sqlcipher\release\sqldrivers\*.dll %DSTDIR%\sqldrivers\*.* /D /Y /S /F
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
-	exit 4
+    exit 4
 ) 
+
+rem Copy mystaff client version file
+xcopy %SRCDIR%\mystaff-client\version %DSTDIR%\*.* /Y /S /F
+if "%errorlevel%" NEQ "0" (
+    cd %CWD%
+    exit 5
+)
 
 rem Copy mystaff client executible file
 xcopy mystaff-client\release\*.exe  %DSTDIR%\*.* /Y /S /F
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
-	exit 5
+    exit 5
 ) 
 
 rem Copy internal libraries which are required for mystaff client
 for %%i in (qntp qtsingleapplication) do (
-	xcopy 3rdparty\%%i\release\*.dll  %DSTDIR%\*.dll /D /Y /S /F
-	if "%errorlevel%" NEQ "0" (
-		cd %CWD%
-		exit 7
-	) 
+    xcopy 3rdparty\%%i\release\*.dll  %DSTDIR%\*.dll /D /Y /S /F
+    if "%errorlevel%" NEQ "0" (
+        cd %CWD%
+        exit 7
+    ) 
 )
 
 rem Pack mystaff client 
-cd %CWD%/install-td-qthybrid-app-%SRCVER%
-%CWD%\zip -9 -r mystaff-client-%SRCVER%-windows.zip %TARGET%
+cd %CWD%/install-qthybrid-app
+%CWD%\zip -9 -r mystaff-client-windows.zip %TARGET%
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
-	exit 8
+    exit 8
 ) 
 
-cd %CWD%\build-td-qthybrid-app-%SRCVER%
+
+if exist "%CWD%\install-dir-qt5runtime-windows.zip" (
+    %CWD%\unzip -d %DSTDIR% %CWD%\install-dir-qt5runtime-windows.zip
+    if "%errorlevel%" NEQ "0" (
+        cd %CWD%
+        exit 3
+    ) 
+)
+
+if exist "%CWD%\install-dir-qt5runtime-windows.zip" (
+    %CWD%\unzip -d %DSTDIR% %CWD%\install-dir-opencvruntime-windows.zip
+    if "%errorlevel%" NEQ "0" (
+        cd %CWD%
+        exit 3
+    ) 
+)
+
+rem Deploy Qt library
+windeployqt.exe --release %DSTDIR%\mystaff.exe 
+
+rem Pack mystaff client 
+cd %CWD%/install-qthybrid-app
+%CWD%\zip -9 -r mystaff-client-windows-deployed.zip %TARGET%
+if "%errorlevel%" NEQ "0" (
+    cd %CWD%
+    exit 8
+) 
+
+cd %CWD%\build-qthybrid-app
 
 rem Copy SQLCipher plugin PDB file
 xcopy 3rdparty\sqlcipher\release\sqldrivers\*.pdb %DSTDIR%\sqldrivers\*.* /D /Y /S /F
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
- 	exit 9
+    exit 9
 ) 
 
 rem Copy mystaff client PDB file
@@ -103,30 +140,29 @@ xcopy mystaff-client\vc*.pdb  %DSTDIR%\*.* /Y /S /F
 xcopy mystaff-client\release\*.pdb  %DSTDIR%\*.* /Y /S /F
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
-	exit 10
+    exit 10
 ) 
 
 rem Copy internal libraries which are required for mystaff client
 for %%i in (qntp qtsingleapplication) do (
-	xcopy 3rdparty\%%i\release\*.pdb  %DSTDIR%\*.pdb /D /Y /S /F
-	if "%errorlevel%" NEQ "0" (
-		cd %CWD%
-		exit 11
-	) 
+    xcopy 3rdparty\%%i\release\*.pdb  %DSTDIR%\*.pdb /D /Y /S /F
+    if "%errorlevel%" NEQ "0" (
+        cd %CWD%
+        exit 11
+    ) 
 )
 
 rem Pack mystaff client PDB files
 rem forfiles /s /m *.txt /c "cmd /c echo @relpath"
-cd %CWD%/install-td-qthybrid-app-%SRCVER%
-%CWD%\zip -9 -r mystaff-client-pdb-%SRCVER%-windows.zip %TARGET% -i *.pdb 
+cd %CWD%/install-qthybrid-app
+%CWD%\zip -9 -r mystaff-client-pdb-windows.zip %TARGET% -i *.pdb 
 if "%errorlevel%" NEQ "0" (
     cd %CWD%
-	exit 12
+    exit 12
 ) 
 
 cd %CWD%
 
-REM echo "Done: install-td-qthybrid-app-%SRCVER%\mystaff-client-%SRCVER%-windows.zip"
-REM echo "      install-td-qthybrid-app-%SRCVER%\mystaff-client-pdb-%SRCVER%-windows.zip"
-echo "%CWD\install-td-qthybrid-app-%SRCVER%\mystaff-client-%SRCVER%-windows.zip"
+echo "%CWD%\install-qthybrid-app\mystaff-client-windows.zip"
+REM echo "      install-qthybrid-app\mystaff-client-pdb-windows.zip"
 exit 0
