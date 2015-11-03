@@ -37,14 +37,14 @@ copy_OpenCVLibraries()
 }
 
 # Setup build environment
-CWD=$(pwd)  # CWD=$(cd "$(dirname "$0")"; pwd)
+CWD=$(pwd)
 SRCDIR=$CWD/qthybrid-app
 SRCVER=$(cat $SRCDIR/mystaff-client/version)
 TARGET=mystaff-client
 
-mkdir -p $CWD/build-qthybrid-app
-rm -fr $CWD/build-qthybrid-app/*
-cd $CWD/build-qthybrid-app
+mkdir -p $CWD/build-qthybrid-app-$SRCVER
+rm -fr $CWD/build-qthybrid-app-$SRCVER/*
+cd $CWD/build-qthybrid-app-$SRCVER
 
 # Configure sources for build
 qmake -r -spec macx-g++ CONFIG+=x86_64 $SRCDIR/qthybrid-app.pro
@@ -63,7 +63,7 @@ fi
 cd $CWD
 
 # Prepare installation directory
-DSTDIR=$CWD/install-qthybrid-app/$TARGET-$(uname -m)
+DSTDIR=$CWD/install-qthybrid-app-$SRCVER/$TARGET-$(uname -m)
 mkdir -p $DSTDIR
 rm -fr $DSTDIR/*
 tar -C $DSTDIR/ -xvzf install-dir-template-macx-$(uname -m).tar.gz
@@ -73,7 +73,7 @@ if [ $? -ne 0 ] ; then
 fi
 
 # copy mystaff client files
-cd $CWD/build-qthybrid-app
+cd $CWD/build-qthybrid-app-$SRCVER
 
 cp -a mystaff-client/mystaff.app $DSTDIR/
 if [ $? -ne 0 ] ; then
@@ -88,13 +88,13 @@ find $DSTDIR -type d -name '*.app' -depth 1 | while read BUNDLEDIR ; do
     mkdir -p "$BUNDLEDIR/Contents/Frameworks" 
     otool -L "$BUNDLEBIN" | grep '\slib.*.dylib' | grep -v '/' | awk '{print $1}' | while read F ; do
         LIBNAME=$(basename "$F")
-        FILE=$(find $CWD/build-qthybrid-app -name "$LIBNAME")
+        FILE=$(find $CWD/build-qthybrid-app-$SRCVER -name "$LIBNAME")
         echo "Copy $FILE to Contents/Frameworks/"
         install_name_tool -change "$F" "@executable_path/../Frameworks/$LIBNAME" "$BUNDLEBIN"
         cp -fL $FILE "$BUNDLEDIR/Contents/Frameworks"
         strip -SXx "$BUNDLEDIR/Contents/Frameworks/$LIBNAME"
     done
-
+    
     # Hack for OpenCV libraries and similar
     copy_OpenCVLibraries $BUNDLEDIR
     otool -L "$BUNDLEBIN" | grep '\slib/lib.*\.dylib' | awk '{print $1}' | while read F ; do
@@ -104,7 +104,7 @@ find $DSTDIR -type d -name '*.app' -depth 1 | while read BUNDLEDIR ; do
         echo "Fix path $F -> $FILE"
         install_name_tool -change "$F" "$FILE" "$BUNDLEBIN"
     done
-
+    
     # do macdeployqt
     $QTDIR/bin/macdeployqt $BUNDLEDIR
     if [ $? -ne 0 ] ; then
@@ -122,7 +122,7 @@ if [ $? -ne 0 ] ; then
     exit 6
 fi
 
-cd $CWD/install-qthybrid-app
+cd $CWD/install-qthybrid-app-$SRCVER
 
 if [ -x $CWD/sign_bundle.sh ] ; then
     clear
@@ -136,12 +136,12 @@ if [ -x $CWD/sign_bundle.sh ] ; then
     done
 fi
 
-rm -f "./mystaff-client-mac.dmg"
-hdiutil create "./mystaff-client-mac.dmg" -srcfolder "$TARGET-$(uname -m)/" -volname "Mystaff Client"
+rm -f "./mystaff-client-$SRCVER-mac.dmg"
+hdiutil create "./mystaff-client-$SRCVER-mac.dmg" -srcfolder "$TARGET-$(uname -m)/" -volname "Mystaff Client"
 if [ $? -ne 0 ] ; then
     cd $CWD
     exit 7
 fi
 cd $CWD
-echo "$CWD/install-qthybrid-app/mystaff-client-mac.dmg"
+echo "$CWD/install-qthybrid-app-$SRCVER/mystaff-client-$SRCVER-mac.dmg"
 exit 0
