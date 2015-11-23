@@ -1,0 +1,4 @@
+./setup-mystaff-client-linux-x86_64.run --enable-debugger --prefix "~/ab-cd"
+./setup-mystaff-client-linux-x86_64.run --prefix "~/ab-cd"
+./setup-mystaff-client-linux-x86_64.run --mode unattended --unattendedmodeui minimal --prefix "~/ab-cd"
+~/setup-mystaff-client/uninstall

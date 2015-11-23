@@ -1,0 +1,4 @@
+setup-mystaff-client-0.0.1.15-windows.exe --enable-debugger --prefix "C:\AB CD"
+setup-mystaff-client-0.0.1.15-windows.exe --prefix "C:\AB CD"
+setup-mystaff-client-0.0.1.15-windows.exe --mode unattended --unattendedmodeui minimal --prefix "C:\AB CD"
+"C:\Program Files (x86)\Mystaff Desktop Client\uninstall.exe" 
